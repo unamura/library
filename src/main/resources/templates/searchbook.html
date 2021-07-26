@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Book found</title>
+</head>
+<body>
+	<h1>Search result</h1>
+	<th:block th:each="book : ${searchList}">
+		<p th:text="'id: ' + ${book.id} + ', title: ' + ${book.title}"></p>
+	</th:block>
+</body>
+</html>

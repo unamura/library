@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Book repository</title>
+</head>
+<body>
+	<h1>List of all book inserted</h1>
+	<th:block th:each="book : ${bookList}">
+		<p th:text="'id: ' + ${book.id} + ', title: ' +${book.title} + 
+			', author: ' + ${book.author} " />
+		<div th:if="${book.pages != 0}"> <p th:text=" 'pages: ' + ${book.pages}"/></div>
+	</th:block>
+	
+	<form action="#" th:action="@{/repo}" method="post">
+			<p>Id of the book to remove:<input type="text" th:name="id"/></p>
+			<p> <input type="submit" value="Delete"/> <input type="reset" value="Reset"/> </p> 
+	</form>
+	
+	<a href="/book">Submit another book</a>
+</body>
+</html>
