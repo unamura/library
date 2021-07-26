@@ -1,6 +1,5 @@
 package com.example.library;
 
-import java.util.List;
 import java.util.Map;
 
 //import org.springframework.web.bind.annotation.RestController;
@@ -39,10 +38,10 @@ public class LibraryController {
 	
 	@RequestMapping("/try/insert")
 	@ResponseBody
-	public String insertBooks() {
+	public String insertBooks(String title, String author) {
 		
 		String result = "";
-		testService.insertIntoDatabase();
+		testService.insertIntoDatabase(title, author);
 
 		for(BookDto bdto : testService.queryFromDatabase()) {
 			result += bdto.getTitle();

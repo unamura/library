@@ -38,10 +38,11 @@ public class TestService {
 		return jdbcTemplate.queryForList("select ID,TITLE,AUTHOR from LIBTEST");
 	}
 
-	public void insertIntoDatabase() {
+	public void insertIntoDatabase(String title, String author) {
 
+		System.out.println("To be ibserted: " + title + " " + author);
 		int rowsInserted = jdbcTemplate.update(
-				"INSERT INTO LIBTEST (TITLE, AUTHOR) VALUES" + " ('Ramses', 'Jacq'),('Alexandros', 'Manfredi')");
+				"insert into LIBTEST (TITLE, AUTHOR) values (?, ?)", title, author);
 
 		System.out.println("Number of rows inserted: " + rowsInserted);
 	}
