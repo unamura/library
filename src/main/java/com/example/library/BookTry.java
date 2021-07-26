@@ -1,7 +1,5 @@
 package com.example.library;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-
 public class BookTry {
 	
 	public static void main(String[] args) {

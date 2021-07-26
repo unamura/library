@@ -71,7 +71,7 @@ public class BookRepository {
 	        return false;
 	    }
 	    try {
-	        double d = Double.parseDouble(value);
+	        //double d = Double.parseDouble(value);
 	    } catch (NumberFormatException nfe) {
 	        return false;
 	    }
