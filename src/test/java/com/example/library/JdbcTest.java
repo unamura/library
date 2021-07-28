@@ -25,8 +25,8 @@ class JdbcTest {
 	private static Statement stat;
 
 	@BeforeAll
-	private static void setUp() throws SQLException, ClassNotFoundException {
-
+	private static void setUpDerbyDatabase() throws SQLException, ClassNotFoundException {
+		log.info("BeforeAll");
 		// Creating testDB database
 		Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 		conn = DriverManager.getConnection("jdbc:derby:memory:TestingDB;create=true");
@@ -53,26 +53,25 @@ class JdbcTest {
 
 		conn.setAutoCommit(false);
 		prep.executeBatch();
-		conn.setAutoCommit(true);
+		conn.setAutoCommit(false);
 
 		// Data retrieve
 		ResultSet rs = stat.executeQuery("select ID, TITLE, AUTHOR from LIBTEST");
-		Map<String, List<String>> actualBookMap = new HashMap<String, List<String>> ();
+
+		Map<String, List<String>> actualBookMap = new HashMap<String, List<String>>();
 		while (rs.next()) {
-			List<String> bookCol = new ArrayList<String> ();
+			List<String> bookCol = new ArrayList<String>();
 			bookCol.add(rs.getString(2));
 			bookCol.add(rs.getString(3));
-			
+
 			actualBookMap.put(rs.getString(1), bookCol);
-			log.info("title " + rs.getString(2));
-			System.out.println("title = " + rs.getString(1));
-			System.out.println("author = " + rs.getString("AUTHOR"));
 		}
-		rs.close();
 		log.info("actualBookMap: " + actualBookMap.toString());
 		log.info("End");
+
 		String expectedBookMap = "{1=[Il mago del nilo, Christian Jacq]}";
-		Assertions.assertEquals( expectedBookMap, actualBookMap.toString() );
+		Assertions.assertEquals(expectedBookMap, actualBookMap.toString());
+		rs.close();
 		/*
 		 * DataSource dataSource = new
 		 * EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
@@ -90,6 +89,18 @@ class JdbcTest {
 		conn.setAutoCommit(false);
 		prep.executeBatch();
 		conn.setAutoCommit(true);
+		ResultSet rs = stat.executeQuery("select ID, TITLE, AUTHOR from LIBTEST");
+
+		// Map<String, List<String>> actualBookMap = new HashMap<String,
+		// List<String>>();
+		String titleActual = "";
+		while (rs.next()) {
+			titleActual += rs.getString(2);
+		}
+		rs.close();
+		log.info("Actual: " + titleActual);
+		String titleExpected = "Dopo le esequie";
+		// Assertions.assertEquals(titleExpected, titleActual);
 
 	}
 
