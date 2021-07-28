@@ -61,7 +61,7 @@ public class TestService {
 		String delete = "delete from LIBTEST where ID = ?";
 
 		int afterDelete = jdbcTemplate.update(delete, id);
-
+		// Try catch
 		if (afterDelete != 0)
 			System.out.println("Employee data deleted for ID " + id);
 		else
