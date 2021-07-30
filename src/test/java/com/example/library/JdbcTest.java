@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
@@ -39,9 +40,6 @@ class JdbcTest {
 		stat.executeUpdate(schema);
 		log.info("Stat: " + stat);
 		// super.setUp();
-		// Creating Entity Manager
-		// emFactory = Persistence.createEntityManagerFactory("TestingDB");
-		// em = emFactory.createEntityManager();
 	}
 
 	@Test
@@ -72,11 +70,7 @@ class JdbcTest {
 		String expectedBookMap = "{1=[Il mago del nilo, Christian Jacq]}";
 		Assertions.assertEquals(expectedBookMap, actualBookMap.toString());
 		rs.close();
-		/*
-		 * DataSource dataSource = new
-		 * EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
-		 * .addScript("classpath:schema.sql") .addScript("classpath:data.sql") .build();
-		 */
+
 	}
 
 	@Test
@@ -94,14 +88,70 @@ class JdbcTest {
 		// Map<String, List<String>> actualBookMap = new HashMap<String,
 		// List<String>>();
 		String titleActual = "";
+		String idActual = "";
 		while (rs.next()) {
-			titleActual += rs.getString(2);
+			titleActual = rs.getString(2);
+			idActual = rs.getString(1);
 		}
 		rs.close();
-		log.info("Actual: " + titleActual);
+		log.info("Actual title: " + titleActual + " id: " + idActual);
 		String titleExpected = "Dopo le esequie";
-		// Assertions.assertEquals(titleExpected, titleActual);
+		Assertions.assertEquals(titleExpected, titleActual);
 
+		String updateQuery = "update LIBTEST set title = ? where ID = ?";
+		PreparedStatement ps = conn.prepareStatement(updateQuery);
+		ps.setString(2, "2");
+		ps.setString(1, "10 Piccoli Indiani");
+		ps.executeUpdate();
+
+		ResultSet rsCheck = stat.executeQuery("select ID, TITLE, AUTHOR from LIBTEST");
+		String titleUpdatedActual = "";
+		while (rsCheck.next()) {
+			rsCheck.getString(1);
+			titleUpdatedActual = rsCheck.getString(2);
+			log.info("row: " + rsCheck.getString(2));
+		}
+		String titleUpdatedExpected = "10 Piccoli Indiani";
+		Assertions.assertEquals(titleUpdatedExpected, titleUpdatedActual);
 	}
 
+	@Test
+	void deleteQueryWithDriverManager() throws SQLException {
+		PreparedStatement prep = conn.prepareStatement("insert into LIBTEST (TITLE, AUTHOR) values (?, ?)");
+		prep.setString(1, "Dopo le esequie");
+		prep.setString(2, "Agatha Christie");
+		prep.addBatch();
+
+		conn.setAutoCommit(false);
+		prep.executeBatch();
+		conn.setAutoCommit(true);
+		
+		List<String> beforDeleteList = new ArrayList<String>();
+		ResultSet rsBefore = stat.executeQuery("select ID, TITLE, AUTHOR from LIBTEST");
+		while (rsBefore.next()) {
+			beforDeleteList.add(rsBefore.getString(1) + " " + rsBefore.getString(2) + " " + rsBefore.getString(3));
+		}
+		log.info(beforDeleteList.toString());
+
+		int rowDeleted = stat.executeUpdate("delete from LIBTEST where ID = 3");
+		log.info("Number of row deleted: " + rowDeleted);
+		Assertions.assertEquals(1, rowDeleted);
+
+		List<String> afterDeleteList = new ArrayList<String>();
+		ResultSet rsAfter = stat.executeQuery("select ID, TITLE, AUTHOR from LIBTEST");
+		while (rsAfter.next()) {
+			afterDeleteList.add(rsAfter.getString(1) + " " + rsAfter.getString(2) + " " + rsAfter.getString(3));
+		}
+		log.info(afterDeleteList.toString());
+	}
+
+	@BeforeEach
+	void dropTableCreated() throws SQLException {
+		// stat = conn.createStatement();
+		String drop = " TRUNCATE TABLE LIBTEST";
+		stat.executeUpdate(drop);
+		log.info("Stat: " + stat);
+		conn.commit();
+		// conn.close();
+	}
 }
